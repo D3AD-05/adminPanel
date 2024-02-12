@@ -8,32 +8,39 @@ import React, { useState } from "react";
 import { auth } from "../../firebase";
 import { Button, TextField } from "@mui/material";
 import "react-phone-input-2/lib/style.css";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  // updateProfile,
-} from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useNavigate } from "react-router";
+import "./phoneAuth.scss";
+
 /*                        --------------                         */
 const PhoneAuth = (props) => {
   const navigate = useNavigate();
   const { data, sendDataToParent } = props;
-  const [phoneNumber, setPhoneNumber] = useState(data);
+  const [phoneNumber, setPhoneNumber] = useState(data ? data : "");
   const [verificationCode, setVerificationCode] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
   // const [verificationData, setVerificationData] = useState(null);
   const [otpError, setOtpError] = useState(false);
+  const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
 
   const handlePhoneChange = (e, formattedValue) => {
-    // Do something with the phone number
-    console.log(formattedValue);
+    console.log(e.target.value);
 
     setPhoneNumber(e.target.value);
   };
 
-  const goToSignUp = () => {
-    sendDataToParent({ from: "sign_in", phoneNumber: phoneNumber });
-    setPhoneNumber(phoneNumber);
+  const goToSignUp = (name) => {
+    console.log("name", name);
+    if (name === "isNewUser") {
+      sendDataToParent({ from: "sign_in", phoneNumber: phoneNumber });
+      setPhoneNumber(phoneNumber);
+    } else if (name === "userCreated") {
+      sendDataToParent({
+        from: "sign_in",
+        msg: "user created",
+        status: "200",
+      });
+    }
   };
 
   // ---- Phone number authentication
@@ -48,9 +55,7 @@ const PhoneAuth = (props) => {
       );
       console.log(confirmation);
       setConfirmationResult(confirmation);
-      // await updateProfile(auth.currentUser, {
-      //   user: "dddd", // Set the user's name
-      // });
+      setIsRecaptchaVerified(true);
     } catch (error) {
       console.error("Error sending code:", error);
     }
@@ -62,9 +67,9 @@ const PhoneAuth = (props) => {
       console.log("data", data);
       // setVerificationData(data);
       if (data._tokenResponse["isNewUser"] === false) {
-        navigate("/home");
+        goToSignUp("userCreated");
       } else if (data._tokenResponse["isNewUser"]) {
-        goToSignUp();
+        goToSignUp("isNewUser");
       }
     } catch (error) {
       console.error("Error sending code:", error);

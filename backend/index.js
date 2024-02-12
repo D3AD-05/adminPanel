@@ -52,15 +52,34 @@ app.get("/getAllUsers", (req, res) => {
 // create
 app.post("/createUser", (req, res) => {
   console.log(req.body);
+  const userName = req.body.userName ? req.body.userName : null;
+  const userPhoneNo = req.body.userPhoneNo ? req.body.userPhoneNo : null;
+  const userEmail = req.body.userEmail ? req.body.userPhoneNo : null;
+  const userType = req.body.userType ? req.body.userType : null;
+  const userStatus = req.body.userStatus ? req.body.userStatus : null;
+  const userImage = req.body.userImage ? req.body.userImage : null;
+
   const sql = `
-    INSERT INTO userDetails (User_Name, User_PhoneNo,User_Type,User_Email,User_Image)
-    VALUES ('${req.body.userName}', '${req.body.userPhoneNo}','${req.body.userType}','${req.body.userEmail}','${req.body.userImage}')
+    INSERT INTO userDetails (User_Name, User_PhoneNo,User_Type,User_Email,User_Status,User_Image)
+    VALUES ('${userName}', '${userPhoneNo}','${userType}','${userEmail}','${userStatus}','${userImage}')
   `;
 
   poolConnect
     .then(() => {
       // Create a new request object
       const request = pool.request();
+      console.log(
+        "----------------create user-----------------------------",
+        sql
+      );
+      console.log(
+        userName,
+        userPhoneNo,
+        userEmail,
+        userType,
+        userStatus,
+        userImage
+      );
       request
         .query(sql)
         .then((QryResp) => {
@@ -80,6 +99,7 @@ app.post("/createUser", (req, res) => {
         .json({ error: "An error occurred while connecting to the database" });
     });
 });
+
 // update /delete
 app.put("/updateUser/:userId", (req, res) => {
   const { userId } = req.params;
@@ -102,13 +122,12 @@ app.put("/updateUser/:userId", (req, res) => {
     })
     .filter(Boolean)
     .join(", ");
-  console.log(updateFields);
   const sql = `
     UPDATE userDetails
     SET ${updateFields}
     WHERE User_Id = ${userId}
   `;
-  console.log(sql);
+
   poolConnect
     .then(() => {
       const request = pool.request();

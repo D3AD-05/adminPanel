@@ -4,18 +4,26 @@ import { PhoneAuth } from "../../components";
 import "@fortawesome/fontawesome-free/css/all.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const SignIn = () => {
-  const navigate = useNavigate();
 
-  const [isSignUpMode, setIsSignUpMode] = useState(true);
+/*                         --                                  */
+const SignIn = () => {
+  /*------------------- states -------------------------*/
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [verifiedData, setVerifiedData] = useState();
   const [selectedUser, setSelectedUser] = useState("3");
+  const [enable, setEnable] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    userName: "",
+    userEmail: "",
     userType: "",
-    phoneNo: "",
+    userPhoneNo: "",
+    userImage: "",
+    userStatus: "",
   });
+
+  const navigate = useNavigate();
+
+  /* --------- functions -------------- */
   const handleSignUpClick = () => {
     setIsSignUpMode(true);
   };
@@ -26,9 +34,13 @@ const SignIn = () => {
 
   const dataFromChild = (data) => {
     console.log("from child ", data);
-    if (data.from) {
+    if (data.from === "sign_in") {
       setIsSignUpMode(true);
       setVerifiedData(data);
+      formData["userPhoneNo"] = data.phoneNumber;
+    } else if (data.from === "sign_up") {
+      console.log("---------------------------");
+      setEnable(true);
     }
   };
 
@@ -41,19 +53,9 @@ const SignIn = () => {
     }
   };
 
-  const getAllUser = () => {
-    axios
-      .get("http://localhost:8081/users")
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const handleOnSubmit = (e) => {
     e.preventDefault();
+    formData["userStatus"] = "1";
     console.log(formData);
     axios
       .post("http://localhost:8081/createUser", formData)
@@ -88,8 +90,8 @@ const SignIn = () => {
               ></i>
               <select
                 className="dropdown-field"
-                id="user"
-                name="user"
+                id="userType"
+                name="userType"
                 value={selectedUser}
                 onChange={handleOnChange}
               >
@@ -99,7 +101,11 @@ const SignIn = () => {
               </select>
             </div>
 
-            {/* <PhoneAuth sendDataToParent={dataFromChild} /> */}
+            {!isSignUpMode ? (
+              <PhoneAuth sendDataToParent={dataFromChild} />
+            ) : (
+              ""
+            )}
             <input
               type="submit"
               value="Login"
@@ -129,8 +135,8 @@ const SignIn = () => {
               <i className="fas fa-user"></i>
               <input
                 type="text"
-                name="name"
-                placeholder="Username"
+                name="userName"
+                placeholder="User Name"
                 onChange={handleOnChange}
               />
             </div>
@@ -138,12 +144,12 @@ const SignIn = () => {
               <i className="fas fa-user"></i>
               <input
                 type="text"
-                name="phoneNo"
-                placeholder="Mobile Number"
+                name="userEmail"
+                placeholder="Email"
                 onChange={handleOnChange}
               />
             </div>
-            <div className="input-field">
+            {/* <div className="input-field">
               <i className="fas fa-envelope"></i>
               <input
                 type="tel"
@@ -151,7 +157,7 @@ const SignIn = () => {
                 placeholder="mobile number"
                 onChange={handleOnChange}
               />
-            </div>
+            </div> */}
             <div className="input-field">
               <i
                 className={
@@ -164,7 +170,7 @@ const SignIn = () => {
               ></i>
               <select
                 className="dropdown-field"
-                id="user"
+                id="userType"
                 name="userType"
                 value={selectedUser}
                 onChange={handleOnChange}
@@ -188,26 +194,31 @@ const SignIn = () => {
                 />
               </div>
             ) : (
-              <PhoneAuth />
+              <PhoneAuth sendDataToParent={dataFromChild} />
             )}
 
-            <input type="submit" className="btn btn2" value="Sign up" />
-            <p className="social-text">Or Sign up with social platforms</p>
-            <div className="social-media">
-              {/* <a href="#" className="social-icon">
+            <input
+              type="submit"
+              className="btn btn2"
+              value="Sign up"
+              onClick={(e) => handleOnSubmit(e)}
+              disabled={enable}
+            />
+            {/* <p className="social-text">Or Sign up with social platforms</p> */}
+            {/* <div className="social-media"> */}
+            {/* <a href="#" className="social-icon">
                 <i className="fab fa-facebook-f"></i>
               </a>
               <a href="#" className="social-icon">
                 <i className="fab fa-twitter"></i>
               </a> */}
-              <a href="#" className="social-icon">
+            {/* <a href="#" className="social-icon">
                 <i className="fab fa-google"></i>
-              </a>
-              {/* <a href="#" className="social-icon">
+              </a> */}
+            {/* <a href="#" className="social-icon">
                 <i className="fab fa-linkedin-in"></i>
               </a> */}
-            </div>
-            <button className="formButton">Submit</button>
+            {/* </div> */}
           </form>
         </div>
       </div>
@@ -220,8 +231,9 @@ const SignIn = () => {
               Discover a world of possibilities! Join us and explore a vibrant
               community where ideas flourish and connections thrive.
             </p>
-            <button onClick={getAllUser}>getallll </button>
-            <button className="btn transparent">Sign up</button>
+            <button className="btn transparent" onClick={handleSignUpClick}>
+              Sign up
+            </button>
           </div>
           <img
             src="https://i.ibb.co/6HXL6q1/Privacy-policy-rafiki.png"
