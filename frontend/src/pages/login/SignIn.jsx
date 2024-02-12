@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import "./signin.css";
-// import { PhoneAuth } from "../../components";
+import { PhoneAuth } from "../../components";
 import "@fortawesome/fontawesome-free/css/all.css";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 const SignIn = () => {
-
-const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [isSignUpMode, setIsSignUpMode] = useState(true);
   const [verifiedData, setVerifiedData] = useState();
@@ -37,31 +36,34 @@ const navigate = useNavigate()
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
     console.log(formData);
-    if(name === "userType"){
+    if (name === "userType") {
       setSelectedUser(value);
     }
   };
 
   const getAllUser = () => {
-    axios.get("http://localhost:8081/users").then((res)=>{
-      console.log("res",res)
-    }).catch(err =>{
-      console.log(err);
-    })
-  }
+    axios
+      .get("http://localhost:8081/users")
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
     axios
-        .post("http://localhost:8081/createUser", formData)
-        .then((res) => {
-          console.log("res========",res);
-          if(res.status == 200){
-            navigate('/')
-          }
-        })
-        .catch((err) => alert(err));
+      .post("http://localhost:8081/createUser", formData)
+      .then((res) => {
+        console.log("res========", res);
+        if (res.status == 200) {
+          navigate("/");
+        }
+      })
+      .catch((err) => alert(err));
   };
 
   return (
@@ -73,7 +75,7 @@ const navigate = useNavigate()
             className={`sign-in-form ${isSignUpMode ? "" : "active-form"}`}
           >
             <h2 className="title">Sign in</h2>
-{/*---------                inputs                                    --------- */}
+            {/*---------                inputs                                    --------- */}
             <div className="input-field">
               <i
                 className={
@@ -96,19 +98,21 @@ const navigate = useNavigate()
                 <option value="1">Admin</option>
               </select>
             </div>
-            
+
             {/* <PhoneAuth sendDataToParent={dataFromChild} /> */}
-            <input type="submit" value="Login"  className={!verifiedData?"btn solid btn2":"btn solid"} />
+            <input
+              type="submit"
+              value="Login"
+              className={!verifiedData ? "btn solid btn2" : "btn solid"}
+            />
             <p className="social-text">Or Sign in with google</p>
             <div className="social-media">
-             
               <a href="#" className="social-icon">
                 <i className="fab fa-google"></i>
               </a>
-              
             </div>
           </form>
-{/*                        -------------------                 */}
+          {/*                        -------------------                 */}
 
           <form
             action="#"
@@ -123,15 +127,30 @@ const navigate = useNavigate()
             ) : null}
             <div className="input-field">
               <i className="fas fa-user"></i>
-              <input type="text" name="name" placeholder="Username"  onChange={handleOnChange}/>
+              <input
+                type="text"
+                name="name"
+                placeholder="Username"
+                onChange={handleOnChange}
+              />
             </div>
             <div className="input-field">
               <i className="fas fa-user"></i>
-              <input type="text" name="phoneNo" placeholder="Mobile Number"  onChange={handleOnChange}/>
+              <input
+                type="text"
+                name="phoneNo"
+                placeholder="Mobile Number"
+                onChange={handleOnChange}
+              />
             </div>
             <div className="input-field">
               <i className="fas fa-envelope"></i>
-              <input type="tel" name="email" placeholder="mobile number" onChange={handleOnChange}/>
+              <input
+                type="tel"
+                name="email"
+                placeholder="mobile number"
+                onChange={handleOnChange}
+              />
             </div>
             <div className="input-field">
               <i
@@ -155,7 +174,7 @@ const navigate = useNavigate()
                 <option value="1">Admin</option>
               </select>
             </div>
-            {/* {verifiedData ? (
+            {verifiedData ? (
               <div className="input-field">
                 <i className="fas fa-phone"></i>
                 <input
@@ -169,8 +188,8 @@ const navigate = useNavigate()
                 />
               </div>
             ) : (
-              // <PhoneAuth />
-            )} */}
+              <PhoneAuth />
+            )}
 
             <input type="submit" className="btn btn2" value="Sign up" />
             <p className="social-text">Or Sign up with social platforms</p>
@@ -188,7 +207,7 @@ const navigate = useNavigate()
                 <i className="fab fa-linkedin-in"></i>
               </a> */}
             </div>
-            <button className="formButton">Submit</button>  
+            <button className="formButton">Submit</button>
           </form>
         </div>
       </div>
@@ -201,10 +220,8 @@ const navigate = useNavigate()
               Discover a world of possibilities! Join us and explore a vibrant
               community where ideas flourish and connections thrive.
             </p>
-            <button onClick={getAllUser} >getallll </button>
-            <button className="btn transparent" >
-              Sign up
-            </button>
+            <button onClick={getAllUser}>getallll </button>
+            <button className="btn transparent">Sign up</button>
           </div>
           <img
             src="https://i.ibb.co/6HXL6q1/Privacy-policy-rafiki.png"

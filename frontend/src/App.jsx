@@ -6,6 +6,7 @@ import SignIn from "./pages/login/SignIn";
 import NavBar from "./components/navbar/Navbar";
 import Home from "./pages/login/home/Home";
 import Footer from "./components/footer/Footer";
+import Notification from "./pages/notification/notification";
 
 function App() {
   // layout
@@ -49,6 +50,10 @@ function App() {
         {
           path: "/catagories",
           element: <Catagories />,
+        },
+        {
+          path: "/notifications",
+          element: <Notification />,
         },
         // {
         //   path: "/users/:id",

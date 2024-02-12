@@ -13,13 +13,14 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 function Users() {
-  const navigate = useNavigate();
-
-  const [toggle, setToggle] = useState(false);
-  const [dataLoad, setDataLoad] = useState(false);
+  /*         ----       states         -----         */
   const [usId, setId] = useState(0);
-  const [selectedUser, setSelectedUser] = useState("3");
+  const [toggle, setToggle] = useState(false);
+  const [userStatus, setUserStatus] = useState(2);
+  const [dataLoad, setDataLoad] = useState(false);
+  const [profileImg, setProfileImg] = useState("");
   const [userDetails, setUserDetails] = useState(0);
+  const [selectedUser, setSelectedUser] = useState("3");
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
@@ -28,10 +29,8 @@ function Users() {
     userStatus: "",
     userImage: "",
   });
-  const [profileImg, setProfileImg] = useState("");
 
   // --------------,
-  console.log("formData", formData);
   const style = {
     display: "flex",
     position: "absolute",
@@ -49,7 +48,7 @@ function Users() {
     fetchData();
   }, [dataLoad]);
 
-  // ----------
+  //  --> getallusers
   const fetchData = () => {
     axios
       .get("http://localhost:8081/getAllUsers")
@@ -301,6 +300,7 @@ function Users() {
         userStatus: editedUser.userStatus,
       });
       setId(editedUser.userId);
+      setUserStatus(editedUser.userStatus);
       setProfileImg(editedUser.userImage);
       setToggle(true);
     } else {
@@ -318,15 +318,11 @@ function Users() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (name === "userType") {
       setSelectedUser(e.target.value);
+    } else if (name === "userStatus") {
+      setUserStatus(e.target.value);
     }
   };
-  const handleStatusChange = () => {
-    // Update userStatus in formData
-    setFormData({ ...formData, userStatus: 2 });
 
-    // Submit the form or perform any other necessary actions
-    handleOnSubmit();
-  };
   const handleUpload = (e) => {
     console.log(e.target.files[0]);
     const image = e.target.files[0];
@@ -347,6 +343,13 @@ function Users() {
       });
   };
 
+  const handleStatusChange = () => {
+    // Update userStatus in formData
+    setFormData({ ...formData, userStatus: 2 });
+
+    // Submit the form or perform any other necessary actions
+    handleOnSubmit();
+  };
   return (
     <div>
       <MUIDataTable
@@ -362,7 +365,6 @@ function Users() {
             <h1>Register</h1>
             <div className="profile-pic">
               <label className="-label" htmlFor="file">
-                {/* <span className="glyphicon glyphicon-camera"></span> */}
                 <span>Change Image</span>
               </label>
               <input id="file" type="file" onChange={(e) => handleUpload(e)} />
@@ -380,16 +382,21 @@ function Users() {
                 onChange={onChange}
               />
             ))}
-            {/*---------                inputs                                    --------- */}
+            {/*---------            form                                    --------- */}
             <div className="formInput">
               <label>User Type</label>
 
               <select
-                className=""
                 id="userType"
                 name="userType"
                 value={selectedUser}
                 onChange={onChange}
+                // style={{
+                //   padding: "15px",
+                //   margin: "10px 0px",
+                //   borderRadius: "5px",
+                //   border: "1px solid gray",
+                // }}
               >
                 <option value="3">Customer</option>
                 <option value="2">Smith</option>
@@ -397,28 +404,35 @@ function Users() {
               </select>
             </div>
 
-            {formData["userStatus"] == 1 ? (
+            {userStatus == "1" ? (
               <Button
                 variant="contained"
                 color="success"
                 className="formButton"
+                name="userStatus"
+                onClick={onChange}
               >
                 Approve
               </Button>
             ) : (
               <div className="formInput">
-                <label>User Type</label>
+                <label>Status</label>
 
                 <select
                   className=""
-                  id="userType"
-                  name="userType"
-                  value={selectedUser}
+                  id="userStatus"
+                  name="userStatus"
+                  value={formData["userStatus"]}
                   onChange={onChange}
+                  style={{
+                    padding: "15px",
+                    margin: "10px 0px",
+                    borderRadius: "5px",
+                    border: "1px solid gray",
+                  }}
                 >
-                  <option value="3">Customer</option>
-                  <option value="2">Smith</option>
-                  <option value="1">Admin</option>
+                  <option value="2">Active</option>
+                  <option value="3">Blocked</option>
                 </select>
               </div>
             )}
