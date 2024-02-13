@@ -36,8 +36,9 @@ const PhoneAuth = (props) => {
       setPhoneNumber(phoneNumber);
     } else if (name === "userCreated") {
       sendDataToParent({
-        from: "sign_in",
-        msg: "user created",
+        from: "sign_up",
+        phoneNumber: phoneNumber,
+        msg: "Verification succefully,click sign in ",
         status: "200",
       });
     }

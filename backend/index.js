@@ -54,36 +54,31 @@ app.post("/createUser", (req, res) => {
   console.log(req.body);
   const userName = req.body.userName ? req.body.userName : null;
   const userPhoneNo = req.body.userPhoneNo ? req.body.userPhoneNo : null;
-  const userEmail = req.body.userEmail ? req.body.userPhoneNo : null;
+  const userEmail = req.body.userEmail ? req.body.userEmail : null;
   const userType = req.body.userType ? req.body.userType : null;
   const userStatus = req.body.userStatus ? req.body.userStatus : null;
-  const userImage = req.body.userImage ? req.body.userImage : null;
+  const userImage = req.body.userImage ? req.body.userImage : "";
 
   const sql = `
     INSERT INTO userDetails (User_Name, User_PhoneNo,User_Type,User_Email,User_Status,User_Image)
-    VALUES ('${userName}', '${userPhoneNo}','${userType}','${userEmail}','${userStatus}','${userImage}')
+    VALUES ('${userName}', '${userPhoneNo}','${userType}','${userEmail}','${userStatus}','${userImage}');
+    SELECT SCOPE_IDENTITY() AS User_Id;
   `;
 
   poolConnect
     .then(() => {
       // Create a new request object
       const request = pool.request();
-      console.log(
-        "----------------create user-----------------------------",
-        sql
-      );
-      console.log(
-        userName,
-        userPhoneNo,
-        userEmail,
-        userType,
-        userStatus,
-        userImage
-      );
+      console.log("----------------create user-----------------------------");
       request
         .query(sql)
         .then((QryResp) => {
-          res.json({ message: "User added successfully", data: QryResp });
+          const createdUser = QryResp.recordset[0].User_Id;
+          console.log("QryResp", QryResp.recordset[0].User_Id);
+          res.json({
+            message: "User added successfully",
+            userId: createdUser,
+          });
         })
         .catch((err) => {
           console.error("Error executing query:", err);
@@ -141,6 +136,40 @@ app.put("/updateUser/:userId", (req, res) => {
           console.error("Error executing query:", err);
           res.status(500).json({
             error: "An error occurred while executing the query",
+          });
+        });
+    })
+    .catch((err) => {
+      console.error("Error connecting to SQL Server:", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while connecting to the database" });
+    });
+});
+
+// get approval status
+
+app.get("/checkForApproval/:userId", (req, res) => {
+  const { userId } = req.params;
+  console.log(req.params, "---------", userId);
+  const sql = `select User_Status  from userDetails where User_Id = ${userId}`;
+
+  poolConnect
+    .then(() => {
+      // Create a new request object
+      const request = pool.request();
+      console.log(sql);
+      request
+        .query(sql)
+        .then((response) => {
+          // Send back the query result
+          console.log(response, "------");
+          res.json(response.recordset);
+        })
+        .catch((err) => {
+          console.error("Error executing query:", err);
+          res.status(500).json({
+            error: "An error occurred while fetching data from the database",
           });
         });
     })

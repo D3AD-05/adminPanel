@@ -7,6 +7,7 @@ import NavBar from "./components/navbar/Navbar";
 import Home from "./pages/login/home/Home";
 import Footer from "./components/footer/Footer";
 import Notification from "./pages/notification/notification";
+import ApprovalWaiting from "./pages/approvalWaiting/ApprovalWaiting";
 
 function App() {
   // layout
@@ -68,6 +69,10 @@ function App() {
     {
       path: "/login",
       element: <SignIn />,
+    },
+    {
+      path: "/approvalWaiting",
+      element: <ApprovalWaiting />,
     },
   ]);
 

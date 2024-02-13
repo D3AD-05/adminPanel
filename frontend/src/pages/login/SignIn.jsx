@@ -9,13 +9,13 @@ import { useNavigate } from "react-router-dom";
 const SignIn = () => {
   /*------------------- states -------------------------*/
   const [isSignUpMode, setIsSignUpMode] = useState(false);
-  const [verifiedData, setVerifiedData] = useState();
+  const [verifiedData, setVerifiedData] = useState({});
   const [selectedUser, setSelectedUser] = useState("3");
   const [enable, setEnable] = useState(false);
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
-    userType: "",
+    userType: "3",
     userPhoneNo: "",
     userImage: "",
     userStatus: "",
@@ -34,12 +34,13 @@ const SignIn = () => {
 
   const dataFromChild = (data) => {
     console.log("from child ", data);
+    setVerifiedData(data);
     if (data.from === "sign_in") {
       setIsSignUpMode(true);
-      setVerifiedData(data);
       formData["userPhoneNo"] = data.phoneNumber;
     } else if (data.from === "sign_up") {
-      console.log("---------------------------");
+      formData["userPhoneNo"] = data.phoneNumber;
+      console.log("---------------------------", verifiedData);
       setEnable(true);
     }
   };
@@ -54,15 +55,20 @@ const SignIn = () => {
   };
 
   const handleOnSubmit = (e) => {
-    e.preventDefault();
     formData["userStatus"] = "1";
-    console.log(formData);
+    e.preventDefault();
+    console.log("on save", formData);
     axios
       .post("http://localhost:8081/createUser", formData)
       .then((res) => {
-        console.log("res========", res);
+        console.log("res========", res.data);
         if (res.status == 200) {
-          navigate("/");
+          const userId = res.data.userId;
+          navigate("/approvalWaiting", {
+            state: {
+              userId: userId,
+            },
+          });
         }
       })
       .catch((err) => alert(err));
@@ -126,10 +132,12 @@ const SignIn = () => {
             onSubmit={handleOnSubmit}
           >
             <h2 className="title">Sign up</h2>
-            {verifiedData ? (
+            {verifiedData && verifiedData.from === "isNewUser" ? (
               <h3 style={{ color: "red" }}>
                 You are not Registerd to us Please fill the fields{" "}
               </h3>
+            ) : verifiedData && verifiedData.from === "sign_up" ? (
+              <h3 style={{ color: "green" }}>{verifiedData.msg}</h3>
             ) : null}
             <div className="input-field">
               <i className="fas fa-user"></i>
@@ -180,7 +188,7 @@ const SignIn = () => {
                 <option value="1">Admin</option>
               </select>
             </div>
-            {verifiedData ? (
+            {verifiedData && verifiedData.from ? (
               <div className="input-field">
                 <i className="fas fa-phone"></i>
                 <input
@@ -199,10 +207,10 @@ const SignIn = () => {
 
             <input
               type="submit"
-              className="btn btn2"
+              className={enable ? "btn btn" : "btn btn2"}
               value="Sign up"
               onClick={(e) => handleOnSubmit(e)}
-              disabled={enable}
+              disabled={!enable}
             />
             {/* <p className="social-text">Or Sign up with social platforms</p> */}
             {/* <div className="social-media"> */}
