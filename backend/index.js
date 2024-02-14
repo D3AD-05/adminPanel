@@ -1,14 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./config");
+const { pool, poolConnect } = require("./config");
+const orderRoute = require("./routes/orderRoutes");
 
 const app = express();
-const PORT = process.env.PORT || pool.config.port || 8081;
+const PORT = process.env.PORT || 8081;
 
 app.use(cors());
 app.use(express.json());
 
-const poolConnect = pool.connect();
+// const poolConnect = pool.connect();
 
 poolConnect
   .then(() => {
@@ -170,6 +171,89 @@ app.get("/checkForApproval/:userId", (req, res) => {
           console.error("Error executing query:", err);
           res.status(500).json({
             error: "An error occurred while fetching data from the database",
+          });
+        });
+    })
+    .catch((err) => {
+      console.error("Error connecting to SQL Server:", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while connecting to the database" });
+    });
+});
+
+// ===================================
+app.get("/getAllOrders", (req, res) => {
+  console.log("geting All users");
+  const sql = "SELECT * FROM orderMaster";
+  poolConnect
+    .then(() => {
+      // Create a new request object
+      const request = pool.request();
+
+      request
+        .query(sql)
+        .then((result) => {
+          // Send back the query result
+          res.json(result.recordset);
+        })
+        .catch((err) => {
+          console.error("Error executing query:", err);
+          res.status(500).json({
+            error: "An error occurred while fetching data from the database",
+          });
+        });
+    })
+    .catch((err) => {
+      console.error("Error connecting to SQL Server:", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while connecting to the database" });
+    });
+});
+
+// ==================================
+app.put("/approveOrder/:id", (req, res) => {
+  const orderId = req.params.id;
+  console.log(req.params, orderId);
+  // const columnMappings = {
+  //   userName: "User_Name",
+  //   userEmail: "User_Email",
+  //   userphoneNo: "User_PhoneNo",
+  //   userType: "User_Type",
+  //   userStatus: "User_Status",
+  //   userImage: "User_Image",
+  // };
+  // const updateFields = Object.keys(req.body)
+  //   .map((key) => {
+  //     if (key !== "userId") {
+  //       const columnName = columnMappings[key];
+  //       if (columnName) {
+  //         return `${columnName} = '${req.body[key]}'`;
+  //       }
+  //     }
+  //   })
+  //   .filter(Boolean)
+  //   .join(", ");
+  const sql = `
+    UPDATE orderMaster 
+    SET orderStatus = 2
+    WHERE orderNo = ${orderId}
+  `;
+
+  poolConnect
+    .then(() => {
+      const request = pool.request();
+      console.log("xxxx", sql);
+      request
+        .query(sql)
+        .then(() => {
+          res.json({ message: "User updated successfully" });
+        })
+        .catch((err) => {
+          console.error("Error executing query:", err);
+          res.status(500).json({
+            error: "An error occurred while executing the query",
           });
         });
     })
