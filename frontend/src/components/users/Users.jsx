@@ -391,12 +391,12 @@ function Users() {
                 name="userType"
                 value={selectedUser}
                 onChange={onChange}
-                // style={{
-                //   padding: "15px",
-                //   margin: "10px 0px",
-                //   borderRadius: "5px",
-                //   border: "1px solid gray",
-                // }}
+                style={{
+                  padding: "15px",
+                  margin: "10px 0px",
+                  borderRadius: "5px",
+                  border: "1px solid gray",
+                }}
               >
                 <option value="3">Customer</option>
                 <option value="2">Smith</option>
